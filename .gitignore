@@ -1,0 +1,51 @@
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Python (Backend)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# PostgreSQL / Local DB
+*.sql
+dump.sql
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Node / Next.js (Frontend)
+node_modules/
+.next/
+out/
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build Artifacts
+build/
+*.log
+
+# OS Files
+Thumbs.db
