@@ -6,9 +6,9 @@ A Retrieval-Augmented Compliance Questionnaire System
 
 ## 🚀 Live Demo
 
-Frontend: `https://almabase-assignment-nine.vercel.app/`
+Frontend: https://almabase-assignment-nine.vercel.app
 
-Backend API: `https://almabase-assignment.onrender.com`
+Backend API: https://almabase-assignment.onrender.com
 
 ----------
 
@@ -107,46 +107,33 @@ Multiple fictional governance and security documents were created in:
 # 5️⃣ System Architecture
 
 ``` mermaid
-
 flowchart TB
 
-%% ================================
-%% USER LAYER
-%% ================================
 User[User Browser]
 
-%% ================================
-%% FRONTEND LAYER
-%% ================================
-subgraph Frontend [Frontend - Next.js (Vercel)]
-    UI[UI Components]
-    AuthClient[JWT Auth Handling]
-    ExportClient[Export Format Selector]
+subgraph Frontend
+    UI[UI Layer]
+    AuthClient[JWT Handling]
+    ExportClient[Export Selector]
 end
 
-%% ================================
-%% BACKEND LAYER
-%% ================================
-subgraph Backend [Backend - FastAPI (Render)]
+subgraph Backend
     AuthAPI[Auth Routes]
     QuestionnaireAPI[Questionnaire Routes]
-    ReferenceAPI[Reference Upload Routes]
-    AnswerAPI[Answer Generation Routes]
-    
-    Extraction[File Extraction Service\n(PDF / DOCX / TXT)]
-    Normalization[Text Normalization Layer]
-    Chunking[Chunking Engine\n(250 size / 50 overlap)]
-    Retrieval[Retrieval Engine\n(Token Overlap + Coverage)]
-    PromptBuilder[Strict Prompt Builder]
+    ReferenceAPI[Reference Routes]
+    AnswerAPI[Answer Routes]
+
+    Extraction[File Extraction]
+    Normalization[Text Normalization]
+    Chunking[Chunking Engine]
+    Retrieval[Retrieval Engine]
+    PromptBuilder[Prompt Builder]
     LLM[LLM Generation]
-    Confidence[Confidence Scoring Logic]
-    ExportService[Export Engine\n(TXT / DOCX / PDF)]
+    Confidence[Confidence Logic]
+    ExportService[Export Service]
 end
 
-%% ================================
-%% DATABASE
-%% ================================
-subgraph Database [Neon PostgreSQL]
+subgraph Database
     Users[(Users)]
     References[(Reference Documents)]
     Chunks[(Document Chunks)]
@@ -155,10 +142,6 @@ subgraph Database [Neon PostgreSQL]
     Sessions[(Generation Sessions)]
     Answers[(Generated Answers)]
 end
-
-%% ================================
-%% CONNECTIONS
-%% ================================
 
 User --> UI
 UI --> AuthClient
@@ -188,17 +171,9 @@ AuthAPI --> Users
 ReferenceAPI --> References
 QuestionnaireAPI --> Questionnaires
 AnswerAPI --> Sessions
-AnswerAPI --> Answers
-Chunks --> References
 Answers --> Sessions
 Questions --> Questionnaires
-
-%% ================================
-%% DEPLOYMENT LAYER
-%% ================================
-Frontend ---|Deployed on| Vercel[(Vercel)]
-Backend ---|Deployed on| Render[(Render)]
-Database ---|Hosted on| Neon[(Neon DB)]
+Chunks --> References
 ```    
 
 ----------
@@ -206,72 +181,40 @@ Database ---|Hosted on| Neon[(Neon DB)]
 # 6️⃣ Architecture Flow
 
 ``` mermaid
-
 flowchart TD
 
-%% =============================
-%% USER INTERACTION
-%% =============================
-A[User Uploads Questionnaire] --> B[Frontend - Next.js]
+A[User Uploads Questionnaire] --> B[Frontend]
 A2[User Uploads Reference Document] --> B
 
-%% =============================
-%% API CALLS
-%% =============================
 B --> C[FastAPI Backend]
 
-%% =============================
-%% REFERENCE PROCESSING FLOW
-%% =============================
-C --> D[File Extraction Service]
-D --> E[Text Normalization Layer]
-E --> F[Chunking Engine\n(250 words / 50 overlap)]
-F --> G[Store Chunks in PostgreSQL]
+C --> D[File Extraction]
+D --> E[Text Normalization]
+E --> F[Chunking Engine]
+F --> G[Store Chunks in Database]
 
-%% =============================
-%% QUESTION PROCESSING FLOW
-%% =============================
 C --> H[Question Parser]
-H --> I[Store Structured Questions in DB]
+H --> I[Store Questions]
 
-%% =============================
-%% ANSWER GENERATION FLOW
-%% =============================
-J[User Clicks Generate Answers] --> B
+J[User Clicks Generate] --> B
 B --> C
 
 C --> K[Retrieve Relevant Chunks]
-K --> L[Coverage-Based Confidence Calculation]
+K --> L[Calculate Coverage]
 
-L -->|If Confidence < 35%| M[Return: Not found in references]
-L -->|If Confidence ≥ 35%| N[Build Strict Prompt]
+L -->|Low Confidence| M[Return Not Found]
+L -->|Sufficient Confidence| N[Build Prompt]
 
 N --> O[LLM Generation]
-O --> P[Structured Answer Output]
+O --> P[Structured Answer]
 
-P --> Q[Save Answer + Confidence in DB]
+P --> Q[Save Answer and Confidence]
 
-%% =============================
-%% EXPORT FLOW
-%% =============================
 R[User Selects Export Format] --> B
 B --> C
 C --> S[Export Service]
-S -->|TXT| T1[Generate TXT]
-S -->|DOCX| T2[Generate DOCX]
-S -->|PDF| T3[Generate PDF]
-T1 --> U[Download to User]
-T2 --> U
-T3 --> U
-
-%% =============================
-%% DATABASE
-%% =============================
-subgraph PostgreSQL (Neon)
-    G
-    I
-    Q
-end
+S --> T[Generate File]
+T --> U[Download]
 ```
 
 ----------
